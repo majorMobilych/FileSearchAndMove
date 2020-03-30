@@ -15,38 +15,15 @@ public class SolutionsImpl implements Solutions {
     public void sortFilesUsingStreams(String sourceFileName, String currentFilesFolder,
                                       Map<String, String> identifiersAndFolders, String numberOfTestFolder) {
         try {
-            /* We create HashMap, where key is fileName and value is corresponding identifier
-            *  we create a HashMap, because for each fileName there is only one corresponding identifier */
-            Map<String, String> sourceFileContent = new HashMap<>();
-            /* read sourceFile and write info to HashMap-sourceFileContent */
+            Map<String, String> sourceFileNameToId = new HashMap<>();
             Files.lines(Paths.get(sourceFileName)).forEach(s ->
-                    sourceFileContent.putIfAbsent(currentFilesFolder + s.substring(/* use fileName as key, as far as there can not be
-                    several identifiers for a single file. */s.indexOf(":") + 1),
-                            /* identifier as value */s.substring(0, s.indexOf(":"))));
+                    sourceFileNameToId.putIfAbsent(currentFilesFolder + s.substring(s.indexOf(":") + 1),
+                            s.substring(0, s.indexOf(":"))));
 
-
-            //debug
-            sourceFileContent.forEach((k, v) -> System.out.println("key=" + k + ";    value=" + v +"!"));
-
-
-
-            /* for each (key, value) element of sourceFileContent we check, if there exists folder to transport file
-            *  (key is file's name) */
-            sourceFileContent.forEach((fileToTransportName, identifierName) -> {
-                /* check if an identifier exists in identifiersAndFolders-HashMap  */
+            sourceFileNameToId.forEach((fileToTransportName, identifierName) -> {
                 if (identifiersAndFolders.containsKey(identifierName)) {
-
-
-
-                    //debug
-                    System.out.println("fileToTransportName =" + fileToTransportName + ";   identifierName" + identifierName);
-
-
-
-                    /* check if folder, specified with the identifier, exists */
                     if (Files.exists(Paths.get(identifiersAndFolders.get(identifierName)))) {
                         try {
-                            /* if folder exists -> move file there */
                             Files.move(Paths.get(fileToTransportName),
                                     Paths.get(identifiersAndFolders.get(identifierName)),
                                     StandardCopyOption.REPLACE_EXISTING);
